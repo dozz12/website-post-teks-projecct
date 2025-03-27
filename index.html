@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publikasi Teks</title>
+</head>
+<body>
+    <h1>Publikasi Teks</h1>
+    <textarea id="textInput" placeholder="Tulis sesuatu..." rows="4" cols="50"></textarea><br>
+    <button onclick="saveText()">Simpan</button>
+    <h2>Publikasi:</h2>
+    <div id="textList"></div>
+
+    <script>
+        async function saveText() {
+            let text = document.getElementById('textInput').value.trim();
+            if (!text) return alert("Teks tidak boleh kosong!");
+
+            let response = await fetch('/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+
+            if (response.ok) {
+                document.getElementById('textInput').value = "";
+                loadTexts();
+            } else {
+                alert("Gagal menyimpan teks.");
+            }
+        }
+
+        async function loadTexts() {
+            let response = await fetch('/texts');
+            let texts = await response.json();
+            document.getElementById('textList').innerHTML = texts.map(t => `<p>${t}</p>`).join('');
+        }
+
+        document.addEventListener("DOMContentLoaded", loadTexts);
+    </script>
+</body>
+</html>
